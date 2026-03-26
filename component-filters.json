@@ -31,7 +31,10 @@
       "reward",
       "reward-sticky",
       "sticky-cta",
-      "quiz"
+      "quiz",
+      "searchinput",
+      "airesponsecomponent",
+      "searchresults"
     ]
   },
   {
