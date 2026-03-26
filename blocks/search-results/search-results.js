@@ -12,6 +12,7 @@ export default function decorate(block) {
 
   const id = props.id || props.componentid || 'default';
   const searchInputId = props.searchinputid || 'default';
+  const index = props.index || props.searchindex || '';
 
   block.innerHTML = '';
 
@@ -20,6 +21,7 @@ export default function decorate(block) {
   wrapper.classList.add('cai-results-wrapper');
   wrapper.dataset.searchResultsId = id;
   wrapper.dataset.searchInputId = searchInputId;
+  if (index) wrapper.dataset.index = index;
 
   const placeholder = document.createElement('div');
   placeholder.classList.add('cai-placeholder');

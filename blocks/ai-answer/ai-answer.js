@@ -12,6 +12,7 @@ export default function decorate(block) {
 
   const id = props.id || props.componentid || 'default';
   const searchInputId = props.searchinputid || 'default';
+  const clientId = props.clientid || '';
 
   block.innerHTML = '';
 
@@ -20,6 +21,7 @@ export default function decorate(block) {
   wrapper.classList.add('cai-response-wrapper');
   wrapper.dataset.aiResponseId = id;
   wrapper.dataset.searchInputId = searchInputId;
+  if (clientId) wrapper.dataset.clientId = clientId;
 
   const placeholder = document.createElement('div');
   placeholder.classList.add('cai-placeholder');

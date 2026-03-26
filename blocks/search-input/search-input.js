@@ -24,6 +24,19 @@ function getLinkedComponents(searchInputId) {
 
 async function performSearch(query, searchInputId) {
   const { aiAnswers, searchResults } = getLinkedComponents(searchInputId);
+  const timestamp = Date.now();
+
+  // Read clientId from linked AI Answer component
+  let clientId = '';
+  aiAnswers.forEach((el) => {
+    if (el.dataset.clientId) clientId = el.dataset.clientId;
+  });
+
+  // Read index from linked Search Results component
+  let index = '';
+  searchResults.forEach((el) => {
+    if (el.dataset.index) index = el.dataset.index;
+  });
 
   // Show loading states
   aiAnswers.forEach((el) => {
@@ -37,19 +50,26 @@ async function performSearch(query, searchInputId) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['csrf-token'] = token;
 
+  // Build payloads matching the original servlet expectations
+  const genPayload = { query, timestamp };
+  if (clientId) genPayload.clientId = clientId;
+
+  const searchPayload = { query, timestamp };
+  if (index) searchPayload.index = index;
+
   // Call both APIs in parallel
   const [genResponse, searchResponse] = await Promise.allSettled([
     fetch('/bin/caid/gensearch', {
       method: 'POST',
       headers,
       credentials: 'same-origin',
-      body: JSON.stringify({ query }),
+      body: JSON.stringify(genPayload),
     }).then((r) => r.json()),
     fetch('/bin/caid/search', {
       method: 'POST',
       headers,
       credentials: 'same-origin',
-      body: JSON.stringify({ query }),
+      body: JSON.stringify(searchPayload),
     }).then((r) => r.json()),
   ]);
 
