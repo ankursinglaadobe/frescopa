@@ -1,4 +1,20 @@
-const AEM_HOST = 'https://author-p187852-e1967098.adobeaemcloud.com';
+let csrfToken = null;
+
+async function getCsrfToken() {
+  if (csrfToken) return csrfToken;
+  try {
+    const resp = await fetch('/libs/granite/csrf/token.json', { credentials: 'same-origin' });
+    if (resp.ok) {
+      const data = await resp.json();
+      csrfToken = data.token;
+      return csrfToken;
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('[Content AI] Could not fetch CSRF token:', e);
+  }
+  return null;
+}
 
 function getLinkedComponents(searchInputId) {
   const aiAnswers = document.querySelectorAll(`.ai-answer [data-search-input-id="${searchInputId}"]`);
@@ -17,19 +33,23 @@ async function performSearch(query, searchInputId) {
     el.innerHTML = '<div class="cai-loading">Searching...</div>';
   });
 
+  const token = await getCsrfToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['csrf-token'] = token;
+
   // Call both APIs in parallel
   const [genResponse, searchResponse] = await Promise.allSettled([
-    fetch(`${AEM_HOST}/bin/caid/gensearch`, {
+    fetch('/bin/caid/gensearch', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
+      credentials: 'same-origin',
       body: JSON.stringify({ query }),
-      credentials: 'include',
     }).then((r) => r.json()),
-    fetch(`${AEM_HOST}/bin/caid/search`, {
+    fetch('/bin/caid/search', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
+      credentials: 'same-origin',
       body: JSON.stringify({ query }),
-      credentials: 'include',
     }).then((r) => r.json()),
   ]);
 
@@ -40,7 +60,9 @@ async function performSearch(query, searchInputId) {
       const answer = data.answer || data.response || data.text || JSON.stringify(data);
       el.innerHTML = `<div class="cai-answer-content">${answer}</div>`;
     } else {
-      const err = genResponse.status === 'rejected' ? genResponse.reason : genResponse.value.error;
+      const err = genResponse.status === 'rejected'
+        ? genResponse.reason
+        : (genResponse.value && genResponse.value.error);
       el.innerHTML = `<div class="cai-error">Could not generate AI answer: ${err || 'Unknown error'}</div>`;
     }
   });
@@ -64,7 +86,9 @@ async function performSearch(query, searchInputId) {
         </div>`;
       }).join('');
     } else {
-      const err = searchResponse.status === 'rejected' ? searchResponse.reason : searchResponse.value.error;
+      const err = searchResponse.status === 'rejected'
+        ? searchResponse.reason
+        : (searchResponse.value && searchResponse.value.error);
       el.innerHTML = `<div class="cai-error">Search failed: ${err || 'Unknown error'}</div>`;
     }
   });
@@ -89,8 +113,8 @@ export default function decorate(block) {
   btn.classList.add('cai-search-btn');
 
   const onSearch = () => {
-    const query = input.value.trim();
-    if (query) performSearch(query, id);
+    const q = input.value.trim();
+    if (q) performSearch(q, id);
   };
 
   btn.addEventListener('click', onSearch);
