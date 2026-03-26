@@ -1,0 +1,17 @@
+.ai-answer {
+  padding: 20px 0;
+}
+
+.content-ai-response-wrapper {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f9f9f9;
+  min-height: 60px;
+}
+
+.ai-response-placeholder {
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}

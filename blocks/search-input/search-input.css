@@ -1,0 +1,31 @@
+.search-input {
+  padding: 20px 0;
+}
+
+.content-ai-search-input-wrapper {
+  display: flex;
+  gap: 8px;
+  max-width: 600px;
+}
+
+.content-ai-search-input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.content-ai-search-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: var(--link-color, #035fe6);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.content-ai-search-btn:hover {
+  background: var(--link-hover-color, #0045ad);
+}

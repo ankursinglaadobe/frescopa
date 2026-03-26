@@ -1,0 +1,16 @@
+.search-results {
+  padding: 20px 0;
+}
+
+.content-ai-search-results-wrapper {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  min-height: 60px;
+}
+
+.search-results-placeholder {
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
