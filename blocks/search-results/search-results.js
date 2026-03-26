@@ -4,26 +4,26 @@ export default function decorate(block) {
   rows.forEach((row) => {
     const cols = [...row.children];
     if (cols.length >= 2) {
-      const key = cols[0].textContent.trim().toLowerCase();
+      const key = cols[0].textContent.trim().toLowerCase().replace(/\s+/g, '');
       const val = cols[1].textContent.trim();
       props[key] = val;
     }
   });
 
-  const id = props.id || 'default';
+  const id = props.id || props.componentid || 'default';
   const searchInputId = props.searchinputid || 'default';
 
   block.innerHTML = '';
 
   const wrapper = document.createElement('div');
   wrapper.id = `search-results-${id}`;
-  wrapper.classList.add('content-ai-search-results-wrapper');
+  wrapper.classList.add('cai-results-wrapper');
   wrapper.dataset.searchResultsId = id;
   wrapper.dataset.searchInputId = searchInputId;
 
   const placeholder = document.createElement('div');
-  placeholder.classList.add('search-results-placeholder');
-  placeholder.textContent = 'Search results will appear here after searching.';
+  placeholder.classList.add('cai-placeholder');
+  placeholder.textContent = 'Search results will appear here after you search.';
 
   wrapper.append(placeholder);
   block.append(wrapper);

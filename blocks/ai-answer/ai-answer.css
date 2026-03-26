@@ -1,17 +1,42 @@
 .ai-answer {
-  padding: 20px 0;
+  padding: 16px 0;
 }
 
-.content-ai-response-wrapper {
-  padding: 16px;
+.cai-response-wrapper {
+  padding: 20px;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: #f9f9f9;
-  min-height: 60px;
+  border-radius: 12px;
+  background: #fafafa;
+  min-height: 48px;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.ai-response-placeholder {
-  color: #666;
+.cai-placeholder {
+  color: #888;
   font-size: 14px;
   font-style: italic;
+}
+
+.cai-loading {
+  color: #555;
+  font-style: italic;
+}
+
+.cai-answer-content {
+  line-height: 1.7;
+  color: #222;
+}
+
+.cai-answer-content p {
+  margin: 0 0 12px;
+}
+
+.cai-answer-content p:last-child {
+  margin-bottom: 0;
+}
+
+.cai-error {
+  color: #c00;
+  font-size: 14px;
 }
