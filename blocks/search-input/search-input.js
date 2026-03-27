@@ -5,27 +5,24 @@ const MODES = {
   lexical: {
     label: 'Lexical',
     icon: '\ud83d\udcda',
-    color: '#A33532',
     description: 'Keyword matching \u2014 finds stories that contain the exact words you type.',
   },
   semantic: {
     label: 'Semantic',
     icon: '\ud83e\udde0',
-    color: '#00647D',
     description: 'Understands intent and concepts \u2014 finds stories relevant to your meaning, even without exact keyword matches.',
   },
   generative: {
     label: 'Generative',
     icon: '\u2728',
-    color: '#5B4FCF',
     description: 'AI-powered answers \u2014 reads all stories and generates a direct answer to your question.',
   },
 };
 
-const EXAMPLE_QUERIES = [
-  { icon: '\u2615', text: 'How do I brew better espresso at home?' },
-  { icon: '\ud83c\udf0d', text: "Where does Fr\u00e9scopa\u2019s coffee come from?" },
-  { icon: '\ud83c\udf75', text: 'I want to learn how to make latte art' },
+const DEFAULT_INTENTS = [
+  { icon: '\u2615', text: '' },
+  { icon: '\ud83c\udf0d', text: '' },
+  { icon: '\ud83c\udf75', text: '' },
 ];
 
 async function getCsrfToken() {
@@ -181,8 +178,93 @@ async function performSearch(query, resultsEl) {
   }
 }
 
+function buildIntentChip(intent, inputEl, resultsEl) {
+  const chip = document.createElement('div');
+  chip.className = 'cai-intent-chip';
+
+  const face = document.createElement('div');
+  face.className = 'cai-intent-face';
+
+  const icon = document.createElement('span');
+  icon.className = 'cai-intent-icon';
+  icon.textContent = intent.icon;
+
+  const text = document.createElement('span');
+  text.className = 'cai-intent-text';
+  text.textContent = intent.text || 'Click \u270f\ufe0f to set a query';
+
+  if (!intent.text) text.classList.add('cai-intent-empty');
+
+  const editBtn = document.createElement('button');
+  editBtn.type = 'button';
+  editBtn.className = 'cai-intent-edit';
+  editBtn.textContent = '\u270f\ufe0f';
+
+  const editInput = document.createElement('input');
+  editInput.type = 'text';
+  editInput.className = 'cai-intent-input';
+  editInput.value = intent.text;
+  editInput.placeholder = 'Type a query\u2026';
+
+  face.append(icon, text, editBtn);
+  chip.append(face, editInput);
+
+  // Click face to search
+  face.addEventListener('click', (e) => {
+    if (e.target === editBtn) return;
+    const q = intent.text;
+    if (q) {
+      inputEl.value = q;
+      performSearch(q, resultsEl);
+    }
+  });
+
+  // Click edit to show input
+  editBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    face.style.display = 'none';
+    editInput.style.display = 'block';
+    editInput.focus();
+  });
+
+  // Save on blur or Enter
+  const saveEdit = () => {
+    const val = editInput.value.trim();
+    intent.text = val;
+    text.textContent = val || 'Click \u270f\ufe0f to set a query';
+    text.classList.toggle('cai-intent-empty', !val);
+    face.style.display = '';
+    editInput.style.display = '';
+  };
+
+  editInput.addEventListener('blur', saveEdit);
+  editInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      saveEdit();
+      // Also trigger search
+      if (intent.text) {
+        inputEl.value = intent.text;
+        performSearch(intent.text, resultsEl);
+      }
+    }
+    if (e.key === 'Escape') saveEdit();
+  });
+
+  return chip;
+}
+
 export default function decorate(block) {
   block.innerHTML = '';
+
+  // Results area (created early so callbacks can reference it)
+  const resultsEl = document.createElement('div');
+  resultsEl.className = 'cai-results-area';
+
+  // Search input (created early so intent chips can reference it)
+  const inputEl = document.createElement('input');
+  inputEl.type = 'text';
+  inputEl.placeholder = 'Ask a question or search\u2026';
+  inputEl.className = 'cai-search-field';
 
   // Mode toggle
   const modeSection = document.createElement('div');
@@ -211,6 +293,9 @@ export default function decorate(block) {
       modeToggle.querySelectorAll('.cai-mode-btn').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       modeDesc.textContent = mode.description;
+      // Auto-search if query exists
+      const q = inputEl.value.trim();
+      if (q) performSearch(q, resultsEl);
     });
     modeToggle.append(btn);
   });
@@ -223,23 +308,21 @@ export default function decorate(block) {
 
   const exLabel = document.createElement('div');
   exLabel.className = 'cai-section-label';
-  exLabel.innerHTML = 'EXAMPLE QUERIES \u2014 CLICK TO SEARCH';
+  exLabel.innerHTML = 'EXAMPLE QUERIES \u2014 CLICK TO SEARCH, \u270f\ufe0f TO CUSTOMIZE';
 
   const exRow = document.createElement('div');
   exRow.className = 'cai-intents-grid';
 
-  // Results area
-  const resultsEl = document.createElement('div');
-  resultsEl.className = 'cai-results-area';
+  const intents = DEFAULT_INTENTS.map((i) => ({ ...i }));
+  intents.forEach((intent) => {
+    exRow.append(buildIntentChip(intent, inputEl, resultsEl));
+  });
+
+  exSection.append(exLabel, exRow);
 
   // Search bar
   const searchBar = document.createElement('div');
   searchBar.className = 'cai-search-bar';
-
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.placeholder = 'Ask a question or search\u2026';
-  input.className = 'cai-search-field';
 
   const btn = document.createElement('button');
   btn.type = 'button';
@@ -247,26 +330,13 @@ export default function decorate(block) {
   btn.className = 'cai-search-btn';
 
   const onSearch = () => {
-    const q = input.value.trim();
+    const q = inputEl.value.trim();
     if (q) performSearch(q, resultsEl);
   };
 
   btn.addEventListener('click', onSearch);
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') onSearch(); });
+  inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') onSearch(); });
 
-  EXAMPLE_QUERIES.forEach((eq) => {
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.className = 'cai-intent-chip';
-    card.innerHTML = `<span class="cai-intent-icon">${eq.icon}</span> <span class="cai-intent-text">${eq.text}</span>`;
-    card.addEventListener('click', () => {
-      input.value = eq.text;
-      performSearch(eq.text, resultsEl);
-    });
-    exRow.append(card);
-  });
-
-  exSection.append(exLabel, exRow);
-  searchBar.append(input, btn);
+  searchBar.append(inputEl, btn);
   block.append(modeSection, exSection, searchBar, resultsEl);
 }
