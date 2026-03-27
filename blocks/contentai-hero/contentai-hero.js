@@ -37,13 +37,18 @@ export default function decorate(block) {
   if (kicker) {
     const k = document.createElement('span');
     k.className = 'cai-hero-kicker';
-    k.textContent = kicker.replace(/<[^>]*>/g, ''); // plain text only
+    // Use innerHTML then read textContent to decode HTML entities like &amp;
+    const tmp = document.createElement('span');
+    tmp.innerHTML = kicker;
+    k.textContent = tmp.textContent;
     inner.append(k);
   }
 
   const h = document.createElement('h1');
   h.className = 'cai-hero-title';
-  h.textContent = title.replace(/<[^>]*>/g, ''); // plain text only
+  const tmpH = document.createElement('span');
+  tmpH.innerHTML = title;
+  h.textContent = tmpH.textContent;
   inner.append(h);
 
   if (description) {
