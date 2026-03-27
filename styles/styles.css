@@ -637,3 +637,52 @@ p:not(:has(+ p)) {
   margin-top: 40px;
   margin-bottom: 40px;
 }
+
+/* Content AI Search section style */
+main > .section.contentai-search {
+  background: var(--frescopa-color-background, #f5f0eb);
+  padding: 48px 0 16px;
+  margin: 0;
+  text-align: center;
+}
+
+main > .section.contentai-search > div {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-medium, 24px);
+}
+
+main > .section.contentai-search .default-content-wrapper p:first-child {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #3a7c8c;
+  background: rgba(58, 124, 140, 0.1);
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+main > .section.contentai-search h1,
+main > .section.contentai-search h2 {
+  font-family: var(--heading-font-family, 'adobe-garamond-pro', 'Georgia', serif);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 400;
+  color: var(--frescopa-color-brand, #5c1a1a);
+  margin: 0 0 16px;
+  line-height: 1.15;
+}
+
+main > .section.contentai-search .default-content-wrapper p:last-child {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #555;
+  max-width: 640px;
+  margin: 0 auto 24px;
+}
+
+main > .section.contentai-search .default-content-wrapper p:last-child strong {
+  color: #333;
+}

@@ -157,6 +157,10 @@
             "value": "blog"
           },
           {
+            "name": "Content AI Search",
+            "value": "contentai-search"
+          },
+          {
             "name": "Columns",
             "value": "columns"
           }
