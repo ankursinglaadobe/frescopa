@@ -63,6 +63,23 @@ function renderAIAnswer(el, data) {
   el.innerHTML = html;
 }
 
+function getImageUrl(result) {
+  const meta = (result.data && result.data.metadata) || {};
+  // Try twitter:image, then primaryImagePath
+  const imgPath = meta['twitter:image'] || meta.primaryImagePath || '';
+  if (!imgPath) return '';
+  // If it's an absolute URL already, use it
+  if (imgPath.startsWith('http')) return imgPath;
+  // Build publish URL from source domain
+  const source = (result.data && result.data.source) || '';
+  try {
+    const url = new URL(source);
+    return `${url.origin}${imgPath}`;
+  } catch (e) {
+    return '';
+  }
+}
+
 function renderSearchResults(el, data) {
   const results = data.results || [];
 
@@ -77,12 +94,16 @@ function renderSearchResults(el, data) {
     const source = (result.data && result.data.source) || '#';
     const snippet = extractSnippet(result.data && result.data.text);
     const score = result.score ? result.score.toFixed(2) : '';
+    const imageUrl = getImageUrl(result);
 
     return `<div class="cai-result-card">
-      <a href="${source}" class="cai-result-title" target="_blank">${title}</a>
-      ${score ? `<span class="cai-result-score">Relevance: ${score}</span>` : ''}
-      <div class="cai-result-snippet">${snippet}</div>
-      <div class="cai-result-url">${source}</div>
+      ${imageUrl ? `<div class="cai-result-image"><img src="${imageUrl}" alt="${title}" loading="lazy"></div>` : ''}
+      <div class="cai-result-body">
+        <a href="${source}" class="cai-result-title" target="_blank">${title}</a>
+        ${score ? `<span class="cai-result-score">Relevance: ${score}</span>` : ''}
+        <div class="cai-result-snippet">${snippet}</div>
+        <div class="cai-result-url">${source}</div>
+      </div>
     </div>`;
   }).join('');
 }
