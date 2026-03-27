@@ -22,6 +22,71 @@ function getLinkedComponents(searchInputId) {
   return { aiAnswers, searchResults };
 }
 
+function extractSnippet(text, maxLen = 200) {
+  if (!text) return '';
+  // Strip markdown links, images, headings
+  const clean = text
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // [text](url) → text
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '') // images
+    .replace(/#{1,6}\s*/g, '') // headings
+    .replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1') // bold/italic
+    .replace(/_([^_]+)_/g, '$1')
+    .replace(/\n{2,}/g, ' ')
+    .replace(/\n/g, ' ')
+    .trim();
+  if (clean.length <= maxLen) return clean;
+  return `${clean.substring(0, maxLen)}...`;
+}
+
+function renderAIAnswer(el, data) {
+  const answer = data.result || '';
+  const links = data.retrievedLinks || [];
+
+  let html = `<div class="cai-answer-text">${answer}</div>`;
+
+  if (links.length > 0) {
+    html += '<div class="cai-answer-sources"><span class="cai-sources-label">Sources:</span>';
+    html += links
+      .filter((link) => link.url && !link.url.endsWith('/robots.txt'))
+      .map((link) => {
+        const url = link.url;
+        // Extract a readable page name from the URL
+        const parts = url.split('/');
+        const page = parts[parts.length - 1].replace('.html', '').replace(/-/g, ' ');
+        const displayName = page.charAt(0).toUpperCase() + page.slice(1);
+        return `<a href="${url}" class="cai-source-link" target="_blank">${displayName}</a>`;
+      })
+      .join('');
+    html += '</div>';
+  }
+
+  el.innerHTML = html;
+}
+
+function renderSearchResults(el, data) {
+  const results = data.results || [];
+
+  if (results.length === 0) {
+    el.innerHTML = '<div class="cai-no-results">No results found.</div>';
+    return;
+  }
+
+  el.innerHTML = results.map((result) => {
+    const meta = (result.data && result.data.metadata) || {};
+    const title = meta.title || meta['twitter:title'] || 'Untitled';
+    const source = (result.data && result.data.source) || '#';
+    const snippet = extractSnippet(result.data && result.data.text);
+    const score = result.score ? result.score.toFixed(2) : '';
+
+    return `<div class="cai-result-card">
+      <a href="${source}" class="cai-result-title" target="_blank">${title}</a>
+      ${score ? `<span class="cai-result-score">Relevance: ${score}</span>` : ''}
+      <div class="cai-result-snippet">${snippet}</div>
+      <div class="cai-result-url">${source}</div>
+    </div>`;
+  }).join('');
+}
+
 async function performSearch(query, searchInputId) {
   const { aiAnswers, searchResults } = getLinkedComponents(searchInputId);
   const timestamp = Date.now();
@@ -40,17 +105,16 @@ async function performSearch(query, searchInputId) {
 
   // Show loading states
   aiAnswers.forEach((el) => {
-    el.innerHTML = '<div class="cai-loading">Generating AI answer...</div>';
+    el.innerHTML = '<div class="cai-loading"><div class="cai-spinner"></div> Generating AI answer...</div>';
   });
   searchResults.forEach((el) => {
-    el.innerHTML = '<div class="cai-loading">Searching...</div>';
+    el.innerHTML = '<div class="cai-loading"><div class="cai-spinner"></div> Searching...</div>';
   });
 
   const token = await getCsrfToken();
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['csrf-token'] = token;
 
-  // Build payloads matching the original servlet expectations
   const genPayload = { query, timestamp };
   if (clientId) genPayload.clientId = clientId;
 
@@ -76,9 +140,7 @@ async function performSearch(query, searchInputId) {
   // Render AI answer
   aiAnswers.forEach((el) => {
     if (genResponse.status === 'fulfilled' && !genResponse.value.error) {
-      const data = genResponse.value;
-      const answer = data.answer || data.response || data.text || JSON.stringify(data);
-      el.innerHTML = `<div class="cai-answer-content">${answer}</div>`;
+      renderAIAnswer(el, genResponse.value);
     } else {
       const err = genResponse.status === 'rejected'
         ? genResponse.reason
@@ -90,21 +152,7 @@ async function performSearch(query, searchInputId) {
   // Render search results
   searchResults.forEach((el) => {
     if (searchResponse.status === 'fulfilled' && !searchResponse.value.error) {
-      const data = searchResponse.value;
-      const results = data.results || data.items || data.hits || [];
-      if (results.length === 0) {
-        el.innerHTML = '<div class="cai-no-results">No results found.</div>';
-        return;
-      }
-      el.innerHTML = results.map((result) => {
-        const title = result.title || result.name || 'Untitled';
-        const description = result.description || result.snippet || result.text || '';
-        const url = result.url || result.path || '#';
-        return `<div class="cai-result-card">
-          <a href="${url}" class="cai-result-title">${title}</a>
-          <div class="cai-result-description">${description}</div>
-        </div>`;
-      }).join('');
+      renderSearchResults(el, searchResponse.value);
     } else {
       const err = searchResponse.status === 'rejected'
         ? searchResponse.reason
