@@ -638,9 +638,12 @@ p:not(:has(+ p)) {
   margin-bottom: 40px;
 }
 
-/* Content AI Search section style */
+/* =============================================
+   Content AI Search — hero section
+   Values taken from reference: Archive/Stories.html
+   ============================================= */
 main > .section.contentai-search {
-  background: var(--frescopa-color-background, #f4e9dc);
+  background: #F4E9DC;
   padding: 56px 32px 48px;
   margin: 0;
   text-align: center;
@@ -652,68 +655,85 @@ main > .section.contentai-search > div {
   padding: 0;
 }
 
-/* Reset global heading margins inside this section */
+/* Kill every global heading override inside this section */
 main > .section.contentai-search h1,
 main > .section.contentai-search h2,
 main > .section.contentai-search h3,
 main > .section.contentai-search h4,
 main > .section.contentai-search h5,
 main > .section.contentai-search h6 {
-  margin-top: 0;
-  scroll-margin: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  scroll-margin: 0 !important;
+  line-height: normal !important;
 }
 
-/* Badge pill — first text block */
+/* Badge pill  —  .hero-kicker in reference */
 main > .section.contentai-search > .default-content-wrapper:first-child p {
   display: inline-block;
-  font: normal normal 700 11px/1.4 var(--type-base-font-family, roboto, sans-serif);
-  letter-spacing: 1.3px;
+  font-family: Roboto, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 1.3px !important;
   text-transform: uppercase;
-  color: var(--frescopa-color-primary, #00647d);
+  color: #00647D;
   background: rgba(0, 100, 125, 0.1);
   padding: 5px 16px;
   border-radius: 999px;
-  margin: 0 0 22px;
+  margin: 0 0 22px !important;
 }
 
-/* Title */
+/* Title  —  .hero h1 in reference: 400 54px/58px Baskerville, color #58181D */
 main > .section.contentai-search h1 {
-  font: normal normal 400 54px/58px Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, serif !important;
-  color: var(--frescopa-color-text, #58181d) !important;
-  margin: 0 0 16px !important;
+  font-family: Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif !important;
+  font-size: 54px !important;
+  font-weight: 400 !important;
+  line-height: 58px !important;
   letter-spacing: 0 !important;
+  color: #58181D !important;
+  margin: 0 0 16px !important;
 }
 
 main > .section.contentai-search h2 {
-  font: normal normal 400 48px/52px Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, serif !important;
-  color: var(--frescopa-color-text, #58181d) !important;
-  margin: 0 0 16px !important;
+  font-family: Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif !important;
+  font-size: 48px !important;
+  font-weight: 400 !important;
+  line-height: 52px !important;
   letter-spacing: 0 !important;
+  color: #58181D !important;
+  margin: 0 0 16px !important;
 }
 
-/* Description — h5 or last text */
+/* Description  —  .hero-sub in reference: 300 18px/28px Roboto, color #2C2C2C, opacity .8 */
 main > .section.contentai-search h5 {
-  font: normal normal 300 18px/28px var(--type-base-font-family, roboto, sans-serif) !important;
-  color: var(--frescopa-color-black, #2c2c2c) !important;
+  font-family: Roboto, sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 300 !important;
+  line-height: 28px !important;
+  letter-spacing: 0 !important;
+  color: #2C2C2C !important;
   opacity: 0.8;
   max-width: 600px;
   margin: 0 auto !important;
-  letter-spacing: 0 !important;
 }
 
 main > .section.contentai-search h5 strong {
-  font-weight: 500;
+  font-weight: 500 !important;
 }
 
-/* Description as plain text */
 main > .section.contentai-search > .default-content-wrapper:last-child p {
-  font: normal normal 300 18px/28px var(--type-base-font-family, roboto, sans-serif);
-  color: var(--frescopa-color-black, #2c2c2c);
+  font-family: Roboto, sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 300 !important;
+  line-height: 28px !important;
+  letter-spacing: 0 !important;
+  color: #2C2C2C !important;
   opacity: 0.8;
   max-width: 600px;
-  margin: 0 auto;
+  margin: 0 auto !important;
 }
 
 main > .section.contentai-search > .default-content-wrapper:last-child p strong {
-  font-weight: 500;
+  font-weight: 500 !important;
 }
