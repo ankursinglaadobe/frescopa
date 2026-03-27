@@ -1389,36 +1389,6 @@
               }
             }
           }
-        },
-        {
-          "title": "AI Answer",
-          "id": "airesponsecomponent",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "AI Answer",
-                  "model": "airesponsecomponent"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Search Results",
-          "id": "searchresults",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Search Results",
-                  "model": "searchresults"
-                }
-              }
-            }
-          }
         }
       ]
     }
