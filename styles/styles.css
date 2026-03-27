@@ -640,8 +640,8 @@ p:not(:has(+ p)) {
 
 /* Content AI Search section style */
 main > .section.contentai-search {
-  background: var(--frescopa-color-background, #f5f0eb);
-  padding: 48px 0 16px;
+  background: var(--frescopa-color-background, #f4e9dc);
+  padding: 40px 0 24px;
   margin: 0;
   text-align: center;
 }
@@ -652,37 +652,48 @@ main > .section.contentai-search > div {
   padding: 0 var(--spacing-medium, 24px);
 }
 
-main > .section.contentai-search .default-content-wrapper p:first-child {
+/* Badge pill — first text block */
+main > .section.contentai-search > .default-content-wrapper:first-child p {
   display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
+  font: normal normal 700 11px/1.4 var(--type-base-font-family, roboto, sans-serif);
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #3a7c8c;
-  background: rgba(58, 124, 140, 0.1);
-  padding: 6px 18px;
+  color: var(--frescopa-color-text, #58181d);
+  background: rgba(88, 24, 29, 0.12);
+  padding: 8px 20px;
   border-radius: 20px;
-  margin-bottom: 12px;
+  margin: 0 0 8px;
 }
 
-main > .section.contentai-search h1,
+/* Title — h1 inherits Baskerville from the site, just ensure color + spacing */
+main > .section.contentai-search h1 {
+  color: var(--frescopa-color-brand, #a33532);
+  margin: 8px 0 12px;
+}
+
 main > .section.contentai-search h2 {
-  font-family: var(--heading-font-family, 'adobe-garamond-pro', 'Georgia', serif);
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 400;
-  color: var(--frescopa-color-brand, #5c1a1a);
-  margin: 0 0 16px;
-  line-height: 1.15;
+  color: var(--frescopa-color-brand, #a33532);
+  margin: 8px 0 12px;
 }
 
-main > .section.contentai-search .default-content-wrapper p:last-child {
-  font-size: 17px;
-  line-height: 1.7;
-  color: #555;
+/* Description — last text block (or h5) */
+main > .section.contentai-search h5 {
+  font: normal normal 300 17px/1.7 var(--type-base-font-family, roboto, sans-serif);
+  color: #666;
   max-width: 640px;
-  margin: 0 auto 24px;
+  margin: 0 auto 16px;
+  letter-spacing: 0;
 }
 
-main > .section.contentai-search .default-content-wrapper p:last-child strong {
-  color: #333;
+main > .section.contentai-search h5 strong {
+  font-weight: 600;
+  color: #444;
+}
+
+/* Also handle plain p for description */
+main > .section.contentai-search > .default-content-wrapper:last-child p {
+  font: normal normal 300 17px/1.7 var(--type-base-font-family, roboto, sans-serif);
+  color: #666;
+  max-width: 640px;
+  margin: 0 auto 16px;
 }
