@@ -641,7 +641,7 @@ p:not(:has(+ p)) {
 /* Content AI Search section style */
 main > .section.contentai-search {
   background: var(--frescopa-color-background, #f4e9dc);
-  padding: 40px 0 24px;
+  padding: 56px 32px 48px;
   margin: 0;
   text-align: center;
 }
@@ -649,55 +649,57 @@ main > .section.contentai-search {
 main > .section.contentai-search > div {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 var(--spacing-medium, 24px);
+  padding: 0;
 }
 
 /* Badge pill — first text block */
-main > .section.contentai-search > .default-content-wrapper:first-child {
-  margin-top: 24px;
-}
-
 main > .section.contentai-search > .default-content-wrapper:first-child p {
   display: inline-block;
-  font: normal normal 600 10px/1.4 var(--type-base-font-family, roboto, sans-serif);
-  letter-spacing: 1.5px;
+  font: normal normal 700 11px/1.4 var(--type-base-font-family, roboto, sans-serif);
+  letter-spacing: 1.3px;
   text-transform: uppercase;
-  color: #5a5148;
-  background: rgba(0, 0, 0, 0.08);
-  padding: 6px 16px;
-  border-radius: 16px;
-  margin: 0 0 8px;
+  color: var(--frescopa-color-primary, #00647d);
+  background: rgba(0, 100, 125, 0.1);
+  padding: 5px 16px;
+  border-radius: 999px;
+  margin: 0 0 22px;
 }
 
-/* Title — h1 inherits Baskerville from the site, just ensure color + spacing */
+/* Title */
 main > .section.contentai-search h1 {
-  color: var(--frescopa-color-brand, #a33532);
-  margin: 8px 0 12px;
+  font: normal normal 400 54px/58px Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, serif;
+  color: var(--frescopa-color-text, #58181d);
+  margin: 0 0 16px;
 }
 
 main > .section.contentai-search h2 {
-  color: var(--frescopa-color-brand, #a33532);
-  margin: 8px 0 12px;
+  font: normal normal 400 48px/52px Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, serif;
+  color: var(--frescopa-color-text, #58181d);
+  margin: 0 0 16px;
 }
 
-/* Description — last text block (or h5) */
+/* Description — h5 or last text */
 main > .section.contentai-search h5 {
-  font: normal normal 300 17px/1.7 var(--type-base-font-family, roboto, sans-serif);
-  color: #666;
-  max-width: 640px;
-  margin: 0 auto 16px;
+  font: normal normal 300 18px/28px var(--type-base-font-family, roboto, sans-serif);
+  color: var(--frescopa-color-black, #2c2c2c);
+  opacity: 0.8;
+  max-width: 600px;
+  margin: 0 auto;
   letter-spacing: 0;
 }
 
 main > .section.contentai-search h5 strong {
-  font-weight: 600;
-  color: #444;
+  font-weight: 500;
 }
 
-/* Also handle plain p for description */
 main > .section.contentai-search > .default-content-wrapper:last-child p {
-  font: normal normal 300 17px/1.7 var(--type-base-font-family, roboto, sans-serif);
-  color: #666;
-  max-width: 640px;
-  margin: 0 auto 16px;
+  font: normal normal 300 18px/28px var(--type-base-font-family, roboto, sans-serif);
+  color: var(--frescopa-color-black, #2c2c2c);
+  opacity: 0.8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+main > .section.contentai-search > .default-content-wrapper:last-child p strong {
+  font-weight: 500;
 }

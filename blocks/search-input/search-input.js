@@ -76,9 +76,16 @@ function renderAIAnswer(el, data) {
   const answer = data.result || '';
   const links = (data.retrievedLinks || []).filter((l) => l.url && !l.url.endsWith('/robots.txt'));
 
-  let html = `<div class="cai-answer-text">${answer}</div>`;
+  let html = `<div class="cai-gen-header">
+    <div class="cai-gen-avatar">\u2728</div>
+    <div>
+      <div class="cai-gen-label">Generative Answer</div>
+      <div class="cai-gen-sublabel">Powered by Content AI</div>
+    </div>
+  </div>`;
+  html += `<div class="cai-answer-text">${answer}</div>`;
   if (links.length > 0) {
-    html += '<div class="cai-answer-sources"><span class="cai-sources-label">Sources:</span>';
+    html += '<div class="cai-answer-sources"><span class="cai-sources-label">Sources</span>';
     html += links.map((link) => {
       const parts = link.url.split('/');
       const page = parts[parts.length - 1].replace('.html', '').replace(/-/g, ' ');
@@ -105,14 +112,14 @@ function renderSearchResults(el, data, mode) {
   const modeInfo = MODES[mode] || MODES.semantic;
   const banner = `<div class="cai-results-banner">
     <span class="cai-banner-icon">\ud83d\udca1</span>
-    ${modeInfo.label} search found <strong>${count} relevant stories</strong>.
+    <span>${modeInfo.label} search found <strong>${count} relevant stories</strong>.</span>
   </div>`;
 
   const header = `<div class="cai-results-header">
     <h3 class="cai-results-title">Stories Found</h3>
     <div class="cai-results-meta">
       <span class="cai-results-count">${count} results</span>
-      <span class="cai-results-mode-badge">${modeInfo.icon} ${modeInfo.label.toUpperCase()}</span>
+      <span class="cai-results-mode-badge badge-${mode}">${modeInfo.icon} ${modeInfo.label.toUpperCase()}</span>
     </div>
   </div>`;
 
@@ -217,6 +224,7 @@ export default function decorate(block) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.classList.add('cai-mode-btn');
+    btn.dataset.mode = key;
     if (key === currentMode) btn.classList.add('active');
     btn.innerHTML = `${mode.icon} ${mode.label}`;
     btn.addEventListener('click', () => {
