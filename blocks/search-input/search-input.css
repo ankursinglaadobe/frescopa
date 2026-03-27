@@ -2,9 +2,110 @@
   padding: 24px 0;
 }
 
+/* Mode toggle */
+.cai-mode-section {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.cai-mode-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.cai-mode-toggle {
+  display: inline-flex;
+  background: #f0ede8;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+}
+
+.cai-mode-btn {
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cai-mode-btn.active {
+  background: #fff;
+  color: var(--link-color, #035fe6);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
+}
+
+.cai-mode-btn:hover:not(.active) {
+  color: #333;
+}
+
+.cai-mode-desc {
+  font-size: 13px;
+  color: #888;
+  margin-top: 10px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+/* Example queries */
+.cai-examples-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.cai-examples-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+
+.cai-examples-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.cai-example-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  font-size: 14px;
+  color: #444;
+  background: #fff;
+  border: 1px solid #e0dcd6;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.cai-example-card:hover {
+  border-color: var(--link-color, #035fe6);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+}
+
+.cai-example-icon {
+  font-size: 16px;
+}
+
+/* Search input */
 .cai-search-input-wrapper {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   max-width: 700px;
   margin: 0 auto;
 }
@@ -14,7 +115,7 @@
   padding: 14px 18px;
   font-size: 16px;
   border: 2px solid #d0d0d0;
-  border-radius: 8px;
+  border-radius: 10px;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -27,10 +128,11 @@
   padding: 14px 28px;
   font-size: 16px;
   font-weight: 600;
+  white-space: nowrap;
   background: var(--link-color, #035fe6);
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
 }
