@@ -5,16 +5,19 @@ const MODES = {
   lexical: {
     label: 'Lexical',
     icon: '\ud83d\udcda',
+    color: '#A33532',
     description: 'Keyword matching \u2014 finds stories that contain the exact words you type.',
   },
   semantic: {
     label: 'Semantic',
     icon: '\ud83e\udde0',
+    color: '#00647D',
     description: 'Understands intent and concepts \u2014 finds stories relevant to your meaning, even without exact keyword matches.',
   },
   generative: {
     label: 'Generative',
     icon: '\u2728',
+    color: '#5B4FCF',
     description: 'AI-powered answers \u2014 reads all stories and generates a direct answer to your question.',
   },
 };
@@ -33,16 +36,8 @@ async function getCsrfToken() {
       const data = await resp.json();
       csrfToken = data.token;
     }
-  } catch (e) {
-    /* ignore */
-  }
+  } catch (e) { /* ignore */ }
   return csrfToken;
-}
-
-function getLinkedComponents(searchInputId) {
-  const aiAnswers = document.querySelectorAll(`.ai-answer [data-search-input-id="${searchInputId}"]`);
-  const searchResults = document.querySelectorAll(`.search-results [data-search-input-id="${searchInputId}"]`);
-  return { aiAnswers, searchResults };
 }
 
 function extractSnippet(text, maxLen = 180) {
@@ -55,7 +50,7 @@ function extractSnippet(text, maxLen = 180) {
     .replace(/_([^_]+)_/g, '$1')
     .replace(/\n+/g, ' ')
     .trim()
-    .substring(0, maxLen) + (text.length > maxLen ? '...' : '');
+    .substring(0, maxLen) + (text.length > maxLen ? '\u2026' : '');
 }
 
 function getImageUrl(result) {
@@ -63,167 +58,151 @@ function getImageUrl(result) {
   const imgPath = meta['twitter:image'] || meta.primaryImagePath || '';
   if (!imgPath) return '';
   if (imgPath.startsWith('http')) return imgPath;
-  const source = (result.data && result.data.source) || '';
   try {
-    const url = new URL(source);
+    const url = new URL((result.data && result.data.source) || '');
     return `${url.origin}${imgPath}`;
-  } catch (e) {
-    return '';
-  }
+  } catch (e) { return ''; }
 }
 
-function renderAIAnswer(el, data) {
+function renderGenAnswer(container, data) {
   const answer = data.result || '';
   const links = (data.retrievedLinks || []).filter((l) => l.url && !l.url.endsWith('/robots.txt'));
 
-  let html = `<div class="cai-gen-header">
-    <div class="cai-gen-avatar">\u2728</div>
-    <div>
-      <div class="cai-gen-label">Generative Answer</div>
-      <div class="cai-gen-sublabel">Powered by Content AI</div>
+  let html = `<div class="cai-gen-panel">
+    <div class="cai-gen-header">
+      <div class="cai-gen-avatar">\u2728</div>
+      <div>
+        <div class="cai-gen-label">Generative Answer</div>
+        <div class="cai-gen-sublabel">Powered by Content AI</div>
+      </div>
     </div>
-  </div>`;
-  html += `<div class="cai-answer-text">${answer}</div>`;
+    <div class="cai-gen-body">${answer}</div>`;
+
   if (links.length > 0) {
-    html += '<div class="cai-answer-sources"><span class="cai-sources-label">Sources</span>';
+    html += '<div class="cai-gen-sources"><span class="cai-gen-sources-label">Sources</span><div class="cai-gen-sources-list">';
     html += links.map((link) => {
       const parts = link.url.split('/');
       const page = parts[parts.length - 1].replace('.html', '').replace(/-/g, ' ');
       const name = page.charAt(0).toUpperCase() + page.slice(1);
-      return `<a href="${link.url}" class="cai-source-link" target="_blank">${name}</a>`;
+      return `<a href="${link.url}" class="cai-gen-source-tag" target="_blank">${name}</a>`;
     }).join('');
-    html += '</div>';
+    html += '</div></div>';
   }
-  el.innerHTML = html;
+
+  html += '</div>';
+  container.innerHTML = html;
 }
 
-function renderSearchResults(el, data, mode) {
+function renderSearchResults(container, data, mode) {
   const results = (data.results || []).filter((r) => {
     const src = r.data && r.data.source;
     return src && !src.endsWith('/robots.txt');
   });
   const count = results.length;
+  const modeInfo = MODES[mode] || MODES.semantic;
 
   if (count === 0) {
-    el.innerHTML = '<div class="cai-no-results">No results found.</div>';
+    container.innerHTML = '<div class="cai-empty">No results found.</div>';
     return;
   }
 
-  const modeInfo = MODES[mode] || MODES.semantic;
-  const banner = `<div class="cai-results-banner">
-    <span class="cai-banner-icon">\ud83d\udca1</span>
+  const banner = `<div class="cai-insight">
+    <span class="cai-insight-icon">\ud83d\udca1</span>
     <span>${modeInfo.label} search found <strong>${count} relevant stories</strong>.</span>
   </div>`;
 
-  const header = `<div class="cai-results-header">
+  const header = `<div class="cai-results-head">
     <h3 class="cai-results-title">Stories Found</h3>
     <div class="cai-results-meta">
       <span class="cai-results-count">${count} results</span>
-      <span class="cai-results-mode-badge badge-${mode}">${modeInfo.icon} ${modeInfo.label.toUpperCase()}</span>
+      <span class="cai-mode-pill pill-${mode}">${modeInfo.icon} ${modeInfo.label.toUpperCase()}</span>
     </div>
   </div>`;
 
-  const cards = `<div class="cai-results-grid">${results.map((result) => {
+  const cards = `<div class="cai-stories-grid">${results.map((result) => {
     const meta = (result.data && result.data.metadata) || {};
     const title = meta.title || meta['twitter:title'] || 'Untitled';
     const source = (result.data && result.data.source) || '#';
     const snippet = extractSnippet(result.data && result.data.text);
     const imageUrl = getImageUrl(result);
 
-    return `<div class="cai-story-card">
-      ${imageUrl ? `<div class="cai-story-image"><img src="${imageUrl}" alt="${title}" loading="lazy"></div>` : '<div class="cai-story-image cai-story-image-empty"></div>'}
+    return `<a href="${source}" class="cai-story-card" target="_blank">
+      ${imageUrl ? `<div class="cai-story-img"><img src="${imageUrl}" alt="${title}" loading="lazy"></div>` : '<div class="cai-story-img cai-story-img-empty"></div>'}
       <div class="cai-story-body">
-        <a href="${source}" class="cai-story-title" target="_blank">${title}</a>
-        <p class="cai-story-snippet">${snippet}</p>
+        <div class="cai-story-title">${title}</div>
+        <p class="cai-story-teaser">${snippet}</p>
       </div>
-    </div>`;
+    </a>`;
   }).join('')}</div>`;
 
-  el.innerHTML = banner + header + cards;
+  container.innerHTML = banner + header + cards;
 }
 
-async function performSearch(query, searchInputId) {
-  const { aiAnswers, searchResults } = getLinkedComponents(searchInputId);
+async function performSearch(query, resultsEl) {
   const timestamp = Date.now();
-
-  let clientId = '';
-  aiAnswers.forEach((el) => { if (el.dataset.clientId) clientId = el.dataset.clientId; });
-  let index = '';
-  searchResults.forEach((el) => { if (el.dataset.index) index = el.dataset.index; });
-
   const token = await getCsrfToken();
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['csrf-token'] = token;
   const fetchOpts = { method: 'POST', headers, credentials: 'same-origin' };
 
+  resultsEl.innerHTML = '<div class="cai-loading"><div class="cai-spinner"></div> Searching\u2026</div>';
+  resultsEl.style.display = '';
+
   if (currentMode === 'generative') {
-    // Generative: show AI answer, hide search results
-    aiAnswers.forEach((el) => {
-      el.closest('.ai-answer').style.display = '';
-      el.innerHTML = '<div class="cai-loading"><div class="cai-spinner"></div> Generating AI answer\u2026</div>';
-    });
-    searchResults.forEach((el) => { el.closest('.search-results').style.display = 'none'; });
-
-    const payload = { query, timestamp };
-    if (clientId) payload.clientId = clientId;
-
     try {
-      const resp = await fetch('/bin/caid/gensearch', { ...fetchOpts, body: JSON.stringify(payload) });
-      const data = await resp.json();
-      aiAnswers.forEach((el) => {
-        if (!data.error) renderAIAnswer(el, data);
-        else el.innerHTML = `<div class="cai-error">${data.error}</div>`;
+      const resp = await fetch('/bin/caid/gensearch', {
+        ...fetchOpts,
+        body: JSON.stringify({ query, timestamp }),
       });
+      const data = await resp.json();
+      if (data.error) {
+        resultsEl.innerHTML = `<div class="cai-error">${data.error}</div>`;
+      } else {
+        renderGenAnswer(resultsEl, data);
+      }
     } catch (e) {
-      aiAnswers.forEach((el) => { el.innerHTML = `<div class="cai-error">Request failed: ${e.message}</div>`; });
+      resultsEl.innerHTML = `<div class="cai-error">Request failed: ${e.message}</div>`;
     }
   } else {
-    // Lexical or Semantic: show search results, hide AI answer
-    searchResults.forEach((el) => {
-      el.closest('.search-results').style.display = '';
-      el.innerHTML = '<div class="cai-loading"><div class="cai-spinner"></div> Searching\u2026</div>';
-    });
-    aiAnswers.forEach((el) => { el.closest('.ai-answer').style.display = 'none'; });
-
-    const payload = { query, timestamp };
-    if (index) payload.index = index;
-
     try {
-      const resp = await fetch('/bin/caid/search', { ...fetchOpts, body: JSON.stringify(payload) });
-      const data = await resp.json();
-      searchResults.forEach((el) => {
-        if (!data.error) renderSearchResults(el, data, currentMode);
-        else el.innerHTML = `<div class="cai-error">${data.error}</div>`;
+      const resp = await fetch('/bin/caid/search', {
+        ...fetchOpts,
+        body: JSON.stringify({ query, timestamp }),
       });
+      const data = await resp.json();
+      if (data.error) {
+        resultsEl.innerHTML = `<div class="cai-error">${data.error}</div>`;
+      } else {
+        renderSearchResults(resultsEl, data, currentMode);
+      }
     } catch (e) {
-      searchResults.forEach((el) => { el.innerHTML = `<div class="cai-error">Search failed: ${e.message}</div>`; });
+      resultsEl.innerHTML = `<div class="cai-error">Search failed: ${e.message}</div>`;
     }
   }
 }
 
 export default function decorate(block) {
-  const id = block.textContent.trim() || 'default';
   block.innerHTML = '';
 
   // Mode toggle
   const modeSection = document.createElement('div');
-  modeSection.classList.add('cai-mode-section');
+  modeSection.className = 'cai-mode-section';
 
   const modeLabel = document.createElement('div');
-  modeLabel.classList.add('cai-mode-label');
+  modeLabel.className = 'cai-section-label';
   modeLabel.textContent = 'CHOOSE SEARCH MODE';
 
   const modeToggle = document.createElement('div');
-  modeToggle.classList.add('cai-mode-toggle');
+  modeToggle.className = 'cai-mode-toggle';
 
   const modeDesc = document.createElement('div');
-  modeDesc.classList.add('cai-mode-desc');
+  modeDesc.className = 'cai-mode-caption';
   modeDesc.textContent = MODES[currentMode].description;
 
   Object.entries(MODES).forEach(([key, mode]) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.classList.add('cai-mode-btn');
+    btn.className = `cai-mode-btn is-${key.substring(0, 3)}`;
     btn.dataset.mode = key;
     if (key === currentMode) btn.classList.add('active');
     btn.innerHTML = `${mode.icon} ${mode.label}`;
@@ -240,54 +219,54 @@ export default function decorate(block) {
 
   // Example queries
   const exSection = document.createElement('div');
-  exSection.classList.add('cai-examples-section');
+  exSection.className = 'cai-examples-section';
 
   const exLabel = document.createElement('div');
-  exLabel.classList.add('cai-examples-label');
+  exLabel.className = 'cai-section-label';
   exLabel.innerHTML = 'EXAMPLE QUERIES \u2014 CLICK TO SEARCH';
 
   const exRow = document.createElement('div');
-  exRow.classList.add('cai-examples-row');
+  exRow.className = 'cai-intents-grid';
 
-  // Search wrapper (build early so examples can reference it)
-  const wrapper = document.createElement('div');
-  wrapper.classList.add('cai-search-input-wrapper');
-  wrapper.dataset.searchInputId = id;
+  // Results area
+  const resultsEl = document.createElement('div');
+  resultsEl.className = 'cai-results-area';
+
+  // Search bar
+  const searchBar = document.createElement('div');
+  searchBar.className = 'cai-search-bar';
 
   const input = document.createElement('input');
   input.type = 'text';
-  input.placeholder = 'Ask a question or search...';
-  input.classList.add('cai-search-field');
+  input.placeholder = 'Ask a question or search\u2026';
+  input.className = 'cai-search-field';
 
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.textContent = 'Search Stories';
-  btn.classList.add('cai-search-btn');
+  btn.className = 'cai-search-btn';
 
   const onSearch = () => {
     const q = input.value.trim();
-    if (q) performSearch(q, id);
+    if (q) performSearch(q, resultsEl);
   };
+
+  btn.addEventListener('click', onSearch);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') onSearch(); });
 
   EXAMPLE_QUERIES.forEach((eq) => {
     const card = document.createElement('button');
     card.type = 'button';
-    card.classList.add('cai-example-card');
-    card.innerHTML = `<span class="cai-example-icon">${eq.icon}</span> ${eq.text}`;
+    card.className = 'cai-intent-chip';
+    card.innerHTML = `<span class="cai-intent-icon">${eq.icon}</span> <span class="cai-intent-text">${eq.text}</span>`;
     card.addEventListener('click', () => {
       input.value = eq.text;
-      performSearch(eq.text, id);
+      performSearch(eq.text, resultsEl);
     });
     exRow.append(card);
   });
 
   exSection.append(exLabel, exRow);
-
-  btn.addEventListener('click', onSearch);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') onSearch();
-  });
-
-  wrapper.append(input, btn);
-  block.append(modeSection, exSection, wrapper);
+  searchBar.append(input, btn);
+  block.append(modeSection, exSection, searchBar, resultsEl);
 }
